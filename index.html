@@ -302,7 +302,21 @@
       text-align: center;
     }
 
-    .contact p { margin: 0 0 10px; color: var(--muted); }
+    .contact p { margin: 0 0 16px; color: var(--muted); }
+
+    .contacts {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px 56px;
+    }
+
+    .contacts small {
+      display: block;
+      margin-bottom: 4px;
+      font-size: .85rem;
+      color: var(--muted);
+    }
 
     .mail {
       display: inline-block;
@@ -398,7 +412,16 @@
 
     <section class="contact">
       <p>Есть идея или вопрос? Напишите нам:</p>
-      <a class="mail" href="mailto:cergei.we@mail.ru">cergei.we@mail.ru</a>
+      <div class="contacts">
+        <div>
+          <small>Почта</small>
+          <a class="mail" href="mailto:cergei.we@mail.ru">cergei.we@mail.ru</a>
+        </div>
+        <div>
+          <small>Telegram</small>
+          <a class="mail" href="https://t.me/SergunWE" target="_blank" rel="noopener">@SergunWE</a>
+        </div>
+      </div>
     </section>
   </main>
 
