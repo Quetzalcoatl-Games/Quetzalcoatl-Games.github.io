@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quetzalcoatl Games</title>
+  <meta name="description" content="Quetzalcoatl Games — небольшая команда, которая разрабатывает игры и приложения.">
+  <link rel="icon" href="logo.jpg" type="image/jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&family=Unbounded:wght@600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fcf9f2;
+      --ink: #26341a;
+      --muted: #5b6650;
+      --green: #5e8a2c;
+      --green-dark: #3f6419;
+      --outline: #2d4a14;
+      --yellow: #f4cd52;
+      --red: #d7261e;
+      --card: #ffffff;
+      --head: "Unbounded", "Segoe UI", sans-serif;
+      --body: "Rubik", "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { margin: 0; overflow-x: hidden; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--body);
+      line-height: 1.55;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    /* Ступенчатый орнамент в цветах лого */
+    .band {
+      height: 30px;
+      border-block: 3px solid var(--outline);
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='24'%3E%3Crect width='32' height='24' fill='%23f4cd52'/%3E%3Cpath d='M0 19h8V5h16v14h8' fill='none' stroke='%233f6419' stroke-width='3.5'/%3E%3Ccircle cx='16' cy='13' r='2.6' fill='%23d7261e'/%3E%3C/svg%3E") repeat-x center / 32px 24px;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      gap: 24px;
+      align-items: center;
+      padding: 48px 0 56px;
+      text-align: center;
+    }
+
+    @media (min-width: 760px) {
+      .hero {
+        grid-template-columns: 320px 1fr;
+        text-align: left;
+        padding: 64px 0 72px;
+      }
+    }
+
+    .logo-wrap {
+      justify-self: center;
+      width: min(300px, 72vw);
+      animation: float 5s ease-in-out infinite;
+    }
+
+    .logo-wrap img {
+      display: block;
+      width: 100%;
+      height: auto;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .logo-wrap img.wiggle { animation: wiggle .6s ease; }
+
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(0) scale(1); }
+      20% { transform: rotate(-8deg) scale(1.05); }
+      45% { transform: rotate(6deg) scale(1.05); }
+      70% { transform: rotate(-3deg); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+      50% { transform: translateY(-12px) rotate(1.5deg); }
+    }
+
+    h1 {
+      margin: 0;
+      font-family: var(--head);
+      font-weight: 800;
+      font-size: clamp(1.6rem, 7vw, 3.6rem);
+      line-height: 1.12;
+      color: var(--green-dark);
+      /* перенос только между словами */
+      word-break: keep-all;
+      overflow-wrap: normal;
+      hyphens: none;
+    }
+
+    h1 span { white-space: nowrap; }
+
+    .tagline {
+      display: inline-block;
+      margin: 16px 0 18px;
+      padding: 6px 14px;
+      border: 2px solid var(--outline);
+      border-radius: 999px;
+      background: var(--yellow);
+      font-family: var(--head);
+      font-weight: 600;
+      font-size: clamp(.95rem, 2.6vw, 1.15rem);
+      box-shadow: 3px 3px 0 var(--red);
+    }
+
+    .about {
+      margin: 0;
+      max-width: 520px;
+      font-size: 1.12rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 759px) { .about { margin: 0 auto; } }
+
+    /* ---------- Game (секрет: 7 нажатий на змея) ---------- */
+    .game {
+      background: var(--green-dark);
+      color: var(--bg);
+      padding: 40px 0 48px;
+    }
+
+    .board {
+      position: relative;
+      width: 100%;
+      max-width: 460px;
+      margin: 0 auto;
+      border: 4px solid var(--outline);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 0 0 4px var(--yellow), 0 0 0 8px var(--outline), 8px 12px 0 8px rgba(0, 0, 0, .25);
+    }
+
+    .board.shake { animation: shake .4s ease; }
+
+    @keyframes shake {
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(7px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(2px); }
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1;
+      touch-action: none;
+      background: #fbf5e6;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 24px;
+      text-align: center;
+      color: var(--ink);
+      background: rgba(252, 249, 242, .78);
+      backdrop-filter: blur(2px);
+      transition: opacity .2s ease;
+    }
+
+    .overlay[hidden] { display: flex; opacity: 0; pointer-events: none; }
+
+    .overlay h3 {
+      margin: 0;
+      font-family: var(--head);
+      font-size: 1.4rem;
+      color: var(--green-dark);
+    }
+
+    .overlay h3:empty { display: none; }
+
+    .overlay p { margin: 0 0 6px; max-width: 300px; color: var(--muted); }
+
+    .btn {
+      padding: 12px 28px;
+      border: 2px solid var(--outline);
+      border-radius: 12px;
+      background: var(--red);
+      color: #fff;
+      font-family: var(--head);
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 0 var(--outline);
+      transition: transform .1s ease, box-shadow .1s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 5px 0 var(--outline); }
+    .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--outline); }
+    .btn:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
+
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      max-width: 460px;
+      margin: 24px auto 0;
+      font-family: var(--head);
+      font-weight: 600;
+    }
+
+    .hud b { color: var(--yellow); }
+
+    .dpad {
+      display: none;
+      grid-template-columns: repeat(3, 64px);
+      grid-template-rows: repeat(2, 56px);
+      gap: 8px;
+      justify-content: center;
+      margin: 20px auto 0;
+    }
+
+    @media (pointer: coarse) { .dpad { display: grid; } }
+
+    .dpad button {
+      border: 2px solid var(--outline);
+      border-radius: 12px;
+      background: var(--yellow);
+      color: var(--outline);
+      font-size: 1.4rem;
+      touch-action: manipulation;
+      box-shadow: 0 4px 0 var(--outline);
+    }
+
+    .dpad button:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--outline); }
+    .dpad [data-dir="up"] { grid-column: 2; }
+    .dpad [data-dir="left"] { grid-column: 1; grid-row: 2; }
+    .dpad [data-dir="down"] { grid-column: 2; grid-row: 2; }
+    .dpad [data-dir="right"] { grid-column: 3; grid-row: 2; }
+
+    /* ---------- Links ---------- */
+    .find { padding: 56px 0 24px; }
+
+    h2 {
+      margin: 0 0 28px;
+      font-family: var(--head);
+      font-weight: 800;
+      font-size: clamp(1.4rem, 4.5vw, 2rem);
+      line-height: 1.2;
+      color: var(--green-dark);
+      text-align: center;
+    }
+
+    .cards {
+      display: grid;
+      gap: 16px;
+    }
+
+    @media (min-width: 720px) { .cards { grid-template-columns: repeat(3, 1fr); } }
+
+    .card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px;
+      border: 2px solid var(--outline);
+      border-radius: 16px;
+      background: var(--card);
+      color: var(--ink);
+      text-decoration: none;
+      box-shadow: 5px 5px 0 var(--c, var(--green));
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    .card:hover { transform: translate(-3px, -3px) rotate(-1deg); box-shadow: 8px 8px 0 var(--c, var(--green)); }
+    .card:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--c, var(--green)); }
+    .card:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
+
+    .card img { width: 48px; height: 48px; flex: none; }
+
+    .card strong { display: block; font-family: var(--head); font-weight: 600; font-size: 1.05rem; }
+    .card span { color: var(--muted); font-size: .92rem; }
+
+    /* ---------- Contact ---------- */
+    .contact {
+      padding: 32px 0 56px;
+      text-align: center;
+    }
+
+    .contact p { margin: 0 0 10px; color: var(--muted); }
+
+    .mail {
+      display: inline-block;
+      font-family: var(--head);
+      font-weight: 600;
+      font-size: clamp(1.05rem, 4.5vw, 1.6rem);
+      color: var(--green-dark);
+      text-decoration: none;
+      word-break: break-all;
+      background: linear-gradient(var(--yellow), var(--yellow)) no-repeat left bottom / 100% 35%;
+      transition: background-size .2s ease;
+    }
+
+    .mail:hover { background-size: 100% 100%; }
+    .mail:focus-visible { outline: 3px solid var(--red); outline-offset: 4px; }
+
+    footer {
+      padding: 16px;
+      text-align: center;
+      font-size: .9rem;
+      color: var(--muted);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .logo-wrap { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="band"></div>
+
+  <header class="wrap hero">
+    <div class="logo-wrap">
+      <img id="logo" src="logo.jpg" alt="Логотип Quetzalcoatl Games — пернатый змей" width="1254" height="1254">
+    </div>
+    <div>
+      <h1><span>Quetzalcoatl</span> <span>Games</span></h1>
+      <p class="tagline">Делаем игры и приложения</p>
+      <p class="about">
+        Небольшая команда, которой можно доверить идею: берёмся за&nbsp;любые задачи и&nbsp;доводим дело до&nbsp;конца.
+      </p>
+    </div>
+  </header>
+
+  <div class="band"></div>
+
+  <div id="secret" hidden>
+    <section class="game" aria-label="Мини-игра «Пернатый змей»">
+      <div class="wrap">
+        <div class="board" id="board">
+          <canvas id="game" aria-label="Игровое поле"></canvas>
+          <div class="overlay" id="overlay">
+            <h3 id="ov-title"></h3>
+            <p id="ov-text">Стрелки или WASD на клавиатуре, свайпы на телефоне.</p>
+            <button class="btn" id="play" type="button">Играть</button>
+          </div>
+        </div>
+
+        <div class="hud">
+          <span>Счёт: <b id="score">0</b></span>
+          <span>Рекорд: <b id="best">0</b></span>
+        </div>
+
+        <div class="dpad" aria-label="Управление">
+          <button type="button" data-dir="up" aria-label="Вверх">▲</button>
+          <button type="button" data-dir="left" aria-label="Влево">◀</button>
+          <button type="button" data-dir="down" aria-label="Вниз">▼</button>
+          <button type="button" data-dir="right" aria-label="Вправо">▶</button>
+        </div>
+      </div>
+    </section>
+    <div class="band"></div>
+  </div>
+
+  <main class="wrap">
+    <section class="find" aria-labelledby="find-title">
+      <h2 id="find-title">Где нас найти</h2>
+      <div class="cards">
+        <a class="card" style="--c: #0077ff" href="https://www.rustore.ru/catalog/developer/rc9wir?_rsc=MLYuL4pEz85Bi_nJ" target="_blank" rel="noopener">
+          <img src="icons/rustore.webp" alt="" width="48" height="48">
+          <div><strong>RuStore</strong><span>Все наши игры и приложения</span></div>
+        </a>
+        <a class="card" style="--c: #ed3e45" href="https://appgallery.huawei.ru/app/C111094833" target="_blank" rel="noopener">
+          <img src="icons/appgallery.webp" alt="" width="48" height="48">
+          <div><strong>AppGallery</strong><span>Мы в магазине Huawei</span></div>
+        </a>
+        <a class="card" style="--c: #4c75a3" href="https://vk.ru/quetzalcoatlgamesgroup" target="_blank" rel="noopener">
+          <img src="icons/vk.webp" alt="" width="48" height="48">
+          <div><strong>ВКонтакте</strong><span>Новости и общение</span></div>
+        </a>
+      </div>
+    </section>
+
+    <section class="contact">
+      <p>Есть идея или вопрос? Напишите нам:</p>
+      <a class="mail" href="mailto:cergei.we@mail.ru">cergei.we@mail.ru</a>
+    </section>
+  </main>
+
+  <footer>© 2026 Quetzalcoatl Games</footer>
+  <div class="band"></div>
+
+  <script>
+    /* ---------- Секрет: 7 нажатий на змея открывают игру ---------- */
+    (() => {
+      const logo = document.getElementById('logo');
+      const secret = document.getElementById('secret');
+      let clicks = 0;
+      logo.addEventListener('click', () => {
+        logo.classList.remove('wiggle');
+        void logo.offsetWidth;
+        logo.classList.add('wiggle');
+        if (!secret.hidden || ++clicks < 7) return;
+        secret.hidden = false;
+        initGame();
+        secret.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    })();
+
+    /* ---------- Игра «Пернатый змей» ---------- */
+    function initGame() {
+      const N = 18;
+      const C = {
+        bg1: '#fbf5e6', bg2: '#f4ead0', outline: '#2d4a14', green: '#5e8a2c',
+        yellow: '#f4cd52', red: '#d7261e', cacao: '#7a3e1d', cacaoLight: '#c27a3e'
+      };
+      const KEYS = {
+        ArrowUp: [0, -1], KeyW: [0, -1], ArrowDown: [0, 1], KeyS: [0, 1],
+        ArrowLeft: [-1, 0], KeyA: [-1, 0], ArrowRight: [1, 0], KeyD: [1, 0]
+      };
+
+      const canvas = document.getElementById('game');
+      const ctx = canvas.getContext('2d');
+      const board = document.getElementById('board');
+      const overlay = document.getElementById('overlay');
+      const ovTitle = document.getElementById('ov-title');
+      const ovText = document.getElementById('ov-text');
+      const playBtn = document.getElementById('play');
+      const scoreEl = document.getElementById('score');
+      const bestEl = document.getElementById('best');
+
+      let cell = 0;
+      let snake, dir, queue, food, bonus, score, stepMs;
+      let state = 'ready';
+      let best = 0;
+      let acc = 0, last = 0, t = 0;
+      let particles = [];
+      let inView = false;
+
+      try { best = Number(localStorage.getItem('qg-snake-best')) || 0; } catch (e) {}
+      bestEl.textContent = best;
+
+      const same = (a, b) => a && b && a.x === b.x && a.y === b.y;
+      const rand = n => Math.floor(Math.random() * n);
+
+      function freeCell() {
+        for (let i = 0; i < 1000; i++) {
+          const p = { x: rand(N), y: rand(N) };
+          if (!snake.some(s => same(s, p)) && !same(food, p) && !same(bonus, p)) return p;
+        }
+        return { x: 0, y: 0 };
+      }
+
+      function reset() {
+        snake = [{ x: 6, y: 9 }, { x: 5, y: 9 }, { x: 4, y: 9 }, { x: 3, y: 9 }];
+        dir = { x: 1, y: 0 };
+        queue = [];
+        food = null;
+        bonus = null;
+        food = freeCell();
+        score = 0;
+        stepMs = 150;
+        acc = 0;
+        scoreEl.textContent = 0;
+      }
+
+      function start() {
+        reset();
+        state = 'run';
+        overlay.hidden = true;
+      }
+
+      function gameOver() {
+        state = 'over';
+        burst(snake[0], [C.red, C.yellow, C.green], 30);
+        board.classList.remove('shake');
+        void board.offsetWidth;
+        board.classList.add('shake');
+        const record = score > best;
+        if (record) {
+          best = score;
+          bestEl.textContent = best;
+          try { localStorage.setItem('qg-snake-best', best); } catch (e) {}
+        }
+        ovTitle.textContent = record ? 'Новый рекорд!' : 'Змей запутался';
+        ovText.textContent = 'Счёт: ' + score + (record ? '' : '. Рекорд: ' + best + '.');
+        playBtn.textContent = 'Ещё раз';
+        overlay.hidden = false;
+      }
+
+      function turn(x, y) {
+        const l = queue.length ? queue[queue.length - 1] : dir;
+        if ((x === -l.x && y === -l.y) || (x === l.x && y === l.y)) return;
+        if (queue.length < 3) queue.push({ x, y });
+      }
+
+      function step() {
+        if (queue.length) dir = queue.shift();
+        const h = snake[0];
+        const nh = { x: (h.x + dir.x + N) % N, y: (h.y + dir.y + N) % N };
+        const eats = same(nh, food);
+        const body = eats ? snake : snake.slice(0, -1);
+        if (body.some(s => same(s, nh))) return gameOver();
+
+        snake.unshift(nh);
+        if (eats) {
+          score++;
+          stepMs = Math.max(70, stepMs - 4);
+          burst(food, [C.cacao, C.cacaoLight, C.yellow], 14);
+          food = freeCell();
+          if (!bonus && Math.random() < 0.3) bonus = { ...freeCell(), ttl: 45 };
+        } else {
+          snake.pop();
+        }
+
+        if (bonus) {
+          if (same(nh, bonus)) {
+            score += 5;
+            burst(bonus, [C.yellow, C.green, C.red], 26);
+            const tail = snake[snake.length - 1];
+            snake.push({ ...tail }, { ...tail });
+            bonus = null;
+          } else if (--bonus.ttl <= 0) {
+            bonus = null;
+          }
+        }
+        scoreEl.textContent = score;
+      }
+
+      function burst(p, colors, n) {
+        for (let i = 0; i < n; i++) {
+          const a = Math.random() * Math.PI * 2;
+          const v = 0.002 + Math.random() * 0.005;
+          particles.push({
+            x: p.x + 0.5, y: p.y + 0.5,
+            vx: Math.cos(a) * v, vy: Math.sin(a) * v,
+            life: 1, size: 0.12 + Math.random() * 0.14,
+            color: colors[i % colors.length]
+          });
+        }
+      }
+
+      /* --- отрисовка --- */
+      function resize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const size = Math.round(canvas.clientWidth * dpr);
+        canvas.width = canvas.height = size;
+        cell = size / N;
+      }
+
+      function roundRect(x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+      }
+
+      function drawBoard() {
+        ctx.fillStyle = C.bg1;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = C.bg2;
+        for (let y = 0; y < N; y++) {
+          for (let x = 0; x < N; x++) {
+            if ((x + y) % 2) ctx.fillRect(Math.floor(x * cell), Math.floor(y * cell), Math.ceil(cell), Math.ceil(cell));
+          }
+        }
+      }
+
+      function drawBody() {
+        const c = v => (v + 0.5) * cell;
+        const path = new Path2D();
+        path.moveTo(c(snake[0].x), c(snake[0].y));
+        for (let i = 1; i < snake.length; i++) {
+          const a = snake[i - 1], b = snake[i];
+          const dx = b.x - a.x, dy = b.y - a.y;
+          if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
+            // проход сквозь стену: доводим линию до края и продолжаем с другой стороны
+            const sx = Math.abs(dx) > 1 ? -Math.sign(dx) : 0;
+            const sy = Math.abs(dy) > 1 ? -Math.sign(dy) : 0;
+            path.lineTo(c(a.x) + sx * cell * 0.5, c(a.y) + sy * cell * 0.5);
+            path.moveTo(c(b.x) - sx * cell * 0.5, c(b.y) - sy * cell * 0.5);
+          }
+          path.lineTo(c(b.x), c(b.y));
+        }
+        ctx.lineJoin = 'miter';
+        ctx.lineCap = 'square';
+        // полосы как на теле змея с логотипа
+        [[C.outline, 0.9], [C.yellow, 0.8], [C.outline, 0.56], [C.green, 0.48], [C.red, 0.16]].forEach(([color, w]) => {
+          ctx.strokeStyle = color;
+          ctx.lineWidth = cell * w;
+          ctx.stroke(path);
+        });
+      }
+
+      function drawHead() {
+        const h = snake[0];
+        ctx.save();
+        ctx.translate((h.x + 0.5) * cell, (h.y + 0.5) * cell);
+        ctx.scale(cell, cell);
+        if (dir.x === -1) ctx.scale(-1, 1);
+        else if (dir.y === 1) ctx.rotate(Math.PI / 2);
+        else if (dir.y === -1) ctx.rotate(-Math.PI / 2);
+
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        // хохолок из перьев
+        [[-1.0, -0.5], [-0.9, -0.8], [-0.6, -1.0]].forEach(([ex, ey], i) => {
+          const sway = Math.sin(t / 220 + i) * 0.06;
+          ctx.beginPath();
+          ctx.moveTo(-0.15, -0.2);
+          ctx.quadraticCurveTo(-0.35, -0.55, ex + sway, ey + sway);
+          ctx.strokeStyle = C.outline;
+          ctx.lineWidth = 0.22;
+          ctx.stroke();
+          ctx.strokeStyle = C.green;
+          ctx.lineWidth = 0.13;
+          ctx.stroke();
+        });
+
+        // голова
+        roundRect(-0.48, -0.44, 1.0, 0.88, 0.22);
+        ctx.fillStyle = C.green;
+        ctx.fill();
+        ctx.strokeStyle = C.outline;
+        ctx.lineWidth = 0.07;
+        ctx.stroke();
+
+        // пасть
+        ctx.lineCap = 'butt';
+        ctx.strokeStyle = C.red;
+        ctx.lineWidth = 0.1;
+        ctx.beginPath(); ctx.moveTo(0, 0.14); ctx.lineTo(0.5, 0.14); ctx.stroke();
+        ctx.strokeStyle = C.yellow;
+        ctx.lineWidth = 0.08;
+        ctx.beginPath(); ctx.moveTo(0, 0.27); ctx.lineTo(0.5, 0.27); ctx.stroke();
+        ctx.fillStyle = '#fff';
+        ctx.beginPath(); ctx.moveTo(0.34, 0.14); ctx.lineTo(0.4, 0.32); ctx.lineTo(0.45, 0.14); ctx.fill();
+
+        // глаз
+        ctx.beginPath(); ctx.arc(0.12, -0.15, 0.14, 0, Math.PI * 2);
+        ctx.fillStyle = '#fff'; ctx.fill();
+        ctx.lineWidth = 0.05; ctx.strokeStyle = C.outline; ctx.stroke();
+        ctx.beginPath(); ctx.arc(0.17, -0.15, 0.065, 0, Math.PI * 2);
+        ctx.fillStyle = C.outline; ctx.fill();
+
+        // язык
+        if (Math.sin(t / 170) > 0.55) {
+          ctx.strokeStyle = C.red;
+          ctx.lineWidth = 0.06;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(0.5, 0.14); ctx.lineTo(0.8, 0.14);
+          ctx.lineTo(0.9, 0.05); ctx.moveTo(0.8, 0.14); ctx.lineTo(0.9, 0.23);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function drawFood() {
+        ctx.save();
+        ctx.translate((food.x + 0.5) * cell, (food.y + 0.5 + Math.sin(t / 300) * 0.05) * cell);
+        ctx.scale(cell, cell);
+        ctx.rotate(-0.6);
+        ctx.beginPath(); ctx.ellipse(0, 0, 0.36, 0.23, 0, 0, Math.PI * 2);
+        ctx.fillStyle = C.cacao; ctx.fill();
+        ctx.lineWidth = 0.06; ctx.strokeStyle = C.outline; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(-0.24, 0); ctx.quadraticCurveTo(0, -0.08, 0.24, 0);
+        ctx.strokeStyle = C.cacaoLight; ctx.lineWidth = 0.05; ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawBonus() {
+        if (bonus.ttl < 12 && Math.floor(t / 120) % 2) return;
+        const pulse = 1 + Math.sin(t / 150) * 0.08;
+        ctx.save();
+        ctx.translate((bonus.x + 0.5) * cell, (bonus.y + 0.5) * cell);
+        ctx.scale(cell * pulse, cell * pulse);
+        ctx.beginPath(); ctx.arc(0, 0, 0.55, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(244, 205, 82, .45)'; ctx.fill();
+        ctx.rotate(-0.8);
+        ctx.beginPath(); ctx.ellipse(0, 0, 0.46, 0.17, 0, 0, Math.PI * 2);
+        ctx.fillStyle = C.green; ctx.fill();
+        ctx.lineWidth = 0.06; ctx.strokeStyle = C.outline; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(-0.46, 0); ctx.lineTo(0.36, 0);
+        ctx.strokeStyle = C.yellow; ctx.lineWidth = 0.06; ctx.stroke();
+        ctx.beginPath(); ctx.arc(0.4, 0, 0.08, 0, Math.PI * 2);
+        ctx.fillStyle = C.red; ctx.fill();
+        ctx.restore();
+      }
+
+      function drawParticles(dt) {
+        particles = particles.filter(p => (p.life -= dt * 0.0016) > 0);
+        particles.forEach(p => {
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.vy += 0.000006 * dt;
+          const s = p.size * cell * p.life;
+          ctx.globalAlpha = p.life;
+          ctx.fillStyle = p.color;
+          ctx.fillRect(p.x * cell - s / 2, p.y * cell - s / 2, s, s);
+        });
+        ctx.globalAlpha = 1;
+      }
+
+      function loop(now) {
+        const dt = Math.min(now - last, 100);
+        last = now;
+        t += dt;
+        if (state === 'run') {
+          acc += dt;
+          while (acc >= stepMs && state === 'run') {
+            acc -= stepMs;
+            step();
+          }
+        }
+        drawBoard();
+        drawFood();
+        if (bonus) drawBonus();
+        drawBody();
+        drawHead();
+        drawParticles(dt);
+        requestAnimationFrame(loop);
+      }
+
+      /* --- управление --- */
+      addEventListener('keydown', e => {
+        const k = KEYS[e.code];
+        if (!k) return;
+        if (state === 'run') {
+          e.preventDefault();
+          turn(...k);
+        } else if (inView) {
+          e.preventDefault();
+          start();
+          turn(...k);
+        }
+      });
+
+      let swipe = null;
+      canvas.addEventListener('pointerdown', e => { swipe = { x: e.clientX, y: e.clientY }; });
+      canvas.addEventListener('pointermove', e => {
+        if (!swipe || state !== 'run') return;
+        const dx = e.clientX - swipe.x, dy = e.clientY - swipe.y;
+        if (Math.max(Math.abs(dx), Math.abs(dy)) < 22) return;
+        if (Math.abs(dx) > Math.abs(dy)) turn(Math.sign(dx), 0);
+        else turn(0, Math.sign(dy));
+        swipe = { x: e.clientX, y: e.clientY };
+      });
+      addEventListener('pointerup', () => { swipe = null; });
+      addEventListener('pointercancel', () => { swipe = null; });
+
+      const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
+      document.querySelectorAll('.dpad button').forEach(b => {
+        b.addEventListener('pointerdown', e => {
+          e.preventDefault();
+          if (state !== 'run') start();
+          turn(...DIRS[b.dataset.dir]);
+        });
+      });
+
+      playBtn.addEventListener('click', () => {
+        if (state !== 'run') start();
+      });
+
+      new IntersectionObserver(([en]) => { inView = en.isIntersecting; }, { threshold: 0.5 }).observe(board);
+      new ResizeObserver(resize).observe(canvas);
+
+      reset();
+      resize();
+      requestAnimationFrame(now => { last = now; loop(now); });
+    }
+  </script>
+</body>
+</html>
