@@ -29,6 +29,10 @@
     html, body { margin: 0; overflow-x: hidden; }
 
     body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      min-height: 100dvh;
       background: var(--bg);
       color: var(--ink);
       font-family: var(--body);
@@ -334,6 +338,7 @@
     .mail:focus-visible { outline: 3px solid var(--red); outline-offset: 4px; }
 
     footer {
+      margin-top: auto; /* прижимает футер и нижнюю полоску к низу экрана */
       padding: 16px;
       text-align: center;
       font-size: .9rem;
